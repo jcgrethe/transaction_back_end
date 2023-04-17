@@ -1,5 +1,6 @@
 package org.example.persistance;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,17 +15,26 @@ public class TransactionsHolder {
   }
 
   public void addTransaction(long id, double amount, String type) {
-    addTransaction(id, amount, type, null);
+    addTransaction(id, BigDecimal.valueOf(amount), type, null);
   }
+
   public void addTransaction(long id, double amount, String type, long transactionParentId) {
-    addTransaction(id, amount, type, transactionMap.get(transactionParentId));
+    addTransaction(id, BigDecimal.valueOf(amount), type, transactionMap.get(transactionParentId));
   }
 
   public Transaction getTransaction(long id) {
     return transactionMap.get(id);
   }
 
-  private void addTransaction(long id, double amount, String type, Transaction transactionParent) {
+  public void rollbackTransaction(long id) {
+    if (!transactionMap.containsKey(id)) {
+      throw new IllegalArgumentException();
+    }
+
+    transactionMap.get(id).rollback();
+  }
+
+  private void addTransaction(long id, BigDecimal amount, String type, Transaction transactionParent) {
     Transaction transaction = new Transaction(id, amount, type, transactionParent);
     transactionMap.put(id, transaction);
   }
