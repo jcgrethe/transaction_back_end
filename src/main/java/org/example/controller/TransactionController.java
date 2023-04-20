@@ -47,8 +47,7 @@ public class TransactionController {
   }
 
   @GetMapping("/sum/{id}")
-  @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Long.class),
-      examples = {@ExampleObject(value = "100")}))
+  @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = SumSerializer.class)))
   public ResponseEntity<SumSerializer> getSum(@PathVariable(value = "id") long id) {
     return ResponseEntity.ok().body(new SumSerializer(transactionHolder.getSum(id)));
   }
