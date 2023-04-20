@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.example.persistance.TransactionsHolder;
+import org.example.serializer.SumSerializer;
 import org.example.serializer.TransactionSerializerRequest;
 import org.example.serializer.TransactionSerializerResponse;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +49,9 @@ public class TransactionController {
   @GetMapping("/sum/{id}")
   @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Long.class),
       examples = {@ExampleObject(value = "100")}))
-  public ResponseEntity<String> getSum(@PathVariable(value = "id") long id) {
+  public ResponseEntity<SumSerializer> getSum(@PathVariable(value = "id") long id) {
     try {
-      return ResponseEntity.ok().body("{ sum: " + transactionHolder.getSum(id) + "}");
+      return ResponseEntity.ok().body(new SumSerializer(transactionHolder.getSum(id)));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.notFound().build();
     }
