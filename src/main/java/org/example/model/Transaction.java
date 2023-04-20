@@ -1,14 +1,19 @@
 package org.example.model;
 
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.synchronizedList;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.empty;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.example.exceptions.InvalidAmountException;
 import org.example.exceptions.InvalidNumberFormatException;
 import org.example.exceptions.InvalidTypeException;
 import org.example.exceptions.NegativeIdException;
@@ -16,23 +21,25 @@ import org.example.exceptions.NegativeIdException;
 public class Transaction {
 
   private final long id;
+  private final Optional<Long> parentId;
   private final BigDecimal amount;
-  private final Optional<Transaction> parent;
+  private final List<Transaction> childs;
   private final String type;
   private AtomicBoolean isActive = new AtomicBoolean(true);
 
   public Transaction(long id, BigDecimal amount, String type) {
-    this(id, amount, type, null);
+    this(id, amount, type, empty());
   }
 
-  public Transaction(long id, BigDecimal amount, String type, Transaction parent) {
+  public Transaction(long id, BigDecimal amount, String type, Optional<Long> parentId) {
     validateId(id);
     validateDecimals(amount);
     validateType(type);
     this.id = id;
     this.amount = amount;
-    this.parent = ofNullable(parent);
+    this.childs = synchronizedList(new LinkedList<>());
     this.type = type;
+    this.parentId = parentId;
   }
 
   public long getId() {
@@ -41,10 +48,6 @@ public class Transaction {
 
   public BigDecimal getAmount() {
     return amount;
-  }
-
-  public Optional<Transaction> getParent() {
-    return parent;
   }
 
   public String getType() {
@@ -61,6 +64,10 @@ public class Transaction {
     }
   }
 
+  public void setActive() {
+    isActive.set(true);
+  }
+
   private void validateId(long id) {
     if (id <= 0) {
       throw new NegativeIdException();
@@ -69,6 +76,9 @@ public class Transaction {
 
   private void validateDecimals(BigDecimal amount) {
     requireNonNull(amount);
+    if (amount.compareTo(ZERO) < 0) {
+      throw new InvalidAmountException();
+    }
     if (amount.scale() > 2) {
       throw new InvalidNumberFormatException();
     }
@@ -80,4 +90,15 @@ public class Transaction {
     }
   }
 
+  public List<Transaction> getChilds() {
+    return childs;
+  }
+
+  public void addChild(Transaction transaction) {
+    childs.add(transaction);
+  }
+
+  public Optional<Long> getParentId() {
+    return parentId;
+  }
 }
