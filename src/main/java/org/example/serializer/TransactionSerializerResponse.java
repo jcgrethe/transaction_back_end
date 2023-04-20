@@ -17,25 +17,13 @@ public class TransactionSerializerResponse extends TransactionSerializerRequest 
 
   private List<TransactionSerializerResponse> childs;
 
-  public TransactionSerializerResponse() {
-  }
+  public TransactionSerializerResponse() {}
+
   public TransactionSerializerResponse(Transaction transaction) {
     super(transaction);
     this.id = transaction.getId();
     this.isActive = transaction.isActive();
     childs = transaction.getChilds().stream().map(TransactionSerializerResponse::new).collect(Collectors.toList());
-  }
-
-  public TransactionSerializerResponse(long id, BigDecimal amount, String type, boolean isActive) {
-    super(amount, type, empty());
-    this.id = id;
-    this.isActive = isActive;
-  }
-
-  public TransactionSerializerResponse(long id, BigDecimal amount, String type, boolean isActive, Optional<Long> parentId) {
-    super(amount, type, parentId);
-    this.id = id;
-    this.isActive = isActive;
   }
 
   public long getId() {
@@ -48,10 +36,6 @@ public class TransactionSerializerResponse extends TransactionSerializerRequest 
 
   public List<TransactionSerializerResponse> getChilds() {
     return childs;
-  }
-
-  public void setId(long id) {
-    this.id = id;
   }
 
 }
