@@ -50,11 +50,7 @@ public class TransactionController {
   @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Long.class),
       examples = {@ExampleObject(value = "100")}))
   public ResponseEntity<SumSerializer> getSum(@PathVariable(value = "id") long id) {
-    try {
-      return ResponseEntity.ok().body(new SumSerializer(transactionHolder.getSum(id)));
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.notFound().build();
-    }
+    return ResponseEntity.ok().body(new SumSerializer(transactionHolder.getSum(id)));
   }
 
   @GetMapping("/types/{type}")
